@@ -8,6 +8,7 @@ use lib grep { -d } qw(../lib ./lib ./t/lib);
 use Test::Easy qw(deep_ok);
 
 use Array::Sticky::INC;
+BEGIN { Array::Sticky::INC->make_sticky }
 
 use lib 'volcano';
 isnt( $INC[0], 'volcano' );

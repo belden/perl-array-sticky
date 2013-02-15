@@ -118,22 +118,28 @@ then you might want to lock their behaviors to the end of @INC:
 
 =over 4
 
-=item * perldoc -f require
+=item * L<Devel::INC::Sorted> solves this same problem slightly differently.
 
-=item * L<Acme::Intraweb>
+=item * 'perldoc -f require' and 'perldoc perltie' talk about code hooks in @INC, and tied arrays, respectively
 
-=item * L<The::Net>
+=item * L<Acme::Intraweb> - places a coderef at the tail of @INC
 
-=item * L<Devel::Hide>
+=item * L<The::Net> - places a coderef at the tail of @INC
 
-=item * L<Test::Without::Module>
+=item * L<Devel::Hide> - places a coderef at the head of @INC
+
+=item * L<Test::Without::Module> - places a coderef at the head of @INC
 
 =back
 
-See L<Sticky::Array::> for an actual case
-where you might care about using this module.
+=head1 BUGS AND LIMITATIONS
 
-=head1 BUGS
+If you do something like:
+
+    local @INC = @INC;
+    unshift @INC, '/some/path';
+
+then this module won't be able to preserve your hooks at the head of @INC.
 
 Please report bugs on this project's Github Issues page: L<http://github.com/belden/perl-array-sticky/issues>.
 
