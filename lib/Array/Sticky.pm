@@ -5,15 +5,15 @@ package Array::Sticky;
 our $VERSION = 0.01;
 
 sub TIEARRAY {
-	my ($class, %args) = @_;
+  my ($class, %args) = @_;
 
-	my $self = bless +{
-		head => [ @{ $args{head} || [] } ],
-		body => [ @{ $args{body} || [] } ],
-		tail => [ @{ $args{tail} || [] } ],
-	}, $class;
+  my $self = bless +{
+    head => [ @{ $args{head} || [] } ],
+    body => [ @{ $args{body} || [] } ],
+    tail => [ @{ $args{tail} || [] } ],
+  }, $class;
 
-	return $self;
+  return $self;
 }
 
 sub POP { pop @{shift()->{body}} }
@@ -22,70 +22,70 @@ sub SHIFT { shift @{shift()->{body}} }
 sub UNSHIFT { unshift @{shift()->{body}}, @_ }
 
 sub CLEAR {
-	my ($self) = @_;
-	@{$self->{body}} = ();
+  my ($self) = @_;
+  @{$self->{body}} = ();
 }
 sub EXTEND {}
 sub EXISTS {
-	my ($self, $index) = @_;
-	my @serial = $self->serial;
-	return exists $serial[$index];
+  my ($self, $index) = @_;
+  my @serial = $self->serial;
+  return exists $serial[$index];
 }
 
 sub serial {
-	my ($self) = @_;
-	return map { @{$self->{$_}} } qw(head body tail);
+  my ($self) = @_;
+  return map { @{$self->{$_}} } qw(head body tail);
 }
 
 sub STORE {
-	my ($self, $index, $value) = @_;
-	$self->{body}[$index] = $value;
+  my ($self, $index, $value) = @_;
+  $self->{body}[$index] = $value;
 }
 
 sub SPLICE {
-	my $self = shift;
-	my $offset = shift || 0;
-	my $length = shift; $length = $self->FETCHSIZE if ! defined $length;
+  my $self = shift;
+  my $offset = shift || 0;
+  my $length = shift; $length = $self->FETCHSIZE if ! defined $length;
 
-	# avoid "splice() offset past end of array"
-	no warnings;
+  # avoid "splice() offset past end of array"
+  no warnings;
 
-	return splice @{$self->{body}}, $offset, $length, @_;
+  return splice @{$self->{body}}, $offset, $length, @_;
 }
 
 sub FETCHSIZE {
-	my $self = shift;
+  my $self = shift;
 
-	my $size = 0;
-	my %size = $self->sizes;
+  my $size = 0;
+  my %size = $self->sizes;
 
-	foreach (values %size) {
-		$size += $_;
-	}
+  foreach (values %size) {
+    $size += $_;
+  }
 
-	return $size;
+  return $size;
 }
 
 sub sizes {
-	my $self = shift;
-	return map { $_ => scalar @{$self->{$_}} } qw(head body tail);
+  my $self = shift;
+  return map { $_ => scalar @{$self->{$_}} } qw(head body tail);
 }
 
 sub FETCH {
-	my $self = shift;
-	my $index = shift;
+  my $self = shift;
+  my $index = shift;
 
-	my %size = $self->sizes;
+  my %size = $self->sizes;
 
-	foreach my $slot (qw(head body tail)) {
-		if ($size{$slot} > $index) {
-			return $self->{$slot}[$index];
-		} else {
-			$index -= $size{$slot};
-		}
-	}
+  foreach my $slot (qw(head body tail)) {
+    if ($size{$slot} > $index) {
+      return $self->{$slot}[$index];
+    } else {
+      $index -= $size{$slot};
+    }
+  }
 
-	return $self->{body}[$size{body} + 1] = undef;
+  return $self->{body}[$size{body} + 1] = undef;
 }
 
 1;
